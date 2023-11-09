@@ -8,7 +8,6 @@
 import Config
 
 config :voipstack_classic_panel,
-  ecto_repos: [VoipstackClassicPanel.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
