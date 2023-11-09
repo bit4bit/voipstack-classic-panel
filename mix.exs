@@ -5,7 +5,7 @@ defmodule VoipstackClassicPanel.MixProject do
     [
       app: :voipstack_classic_panel,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -15,7 +15,8 @@ defmodule VoipstackClassicPanel.MixProject do
       ],
       dialyzer: [
         plt_add_apps: [:ex_unit]
-      ]
+      ],
+      compilers: Mix.compilers() ++ [:surface]
     ]
   end
 
@@ -30,7 +31,8 @@ defmodule VoipstackClassicPanel.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"] ++ catalogues()
+  defp elixirc_paths(:dev), do: ["lib"] ++ catalogues()
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -44,7 +46,8 @@ defmodule VoipstackClassicPanel.MixProject do
       {:ecto_sqlite3, ">= 0.0.0"},
       {:phoenix_html, "~> 3.3"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.20.1"},
+      {:phoenix_live_view, "~> 0.19"},
+      {:surface, "~> 0.11"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
@@ -58,7 +61,8 @@ defmodule VoipstackClassicPanel.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:surface_catalogue, "~> 0.6.0"}
     ]
   end
 
@@ -77,6 +81,12 @@ defmodule VoipstackClassicPanel.MixProject do
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+    ]
+  end
+
+  def catalogues do
+    [
+      "priv/catalogue"
     ]
   end
 end

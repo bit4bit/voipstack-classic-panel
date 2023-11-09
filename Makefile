@@ -1,4 +1,4 @@
-TARGET=_build/test/lib/challenge/ebin/Elixir.Challenge.Application.beam
+TARGET=_build/test/lib/voipstack_classic_panel/ebin/voipstack_classic_panel.app
 
 $(TARGET):
 	MIX_ENV=test mix do deps.get, deps.compile
@@ -14,8 +14,12 @@ compile:
 	@echo "#### MIX COMPILE ####"
 	MIX_ENV=test mix compile
 
+format:
+	@echo "#### MIX FORMAT####"
+	MIX_ENV=test mix format
+
 .PHONY: ci
-ci: $(TARGET) compile lint
+ci: $(TARGET) compile lint format
 	@echo "#### MIX TEST ####"
 	MIX_ENV=test mix test
 

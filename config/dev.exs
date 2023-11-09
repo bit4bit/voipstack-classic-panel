@@ -23,7 +23,8 @@ config :voipstack_classic_panel, VoipstackClassicPanelWeb.Endpoint,
   secret_key_base: "Y5yhP3wdMTQMDjFHjtoppv/dlGUmkohODSfKEpo5txZWkbjqDY+onlB45fvKCcew",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]},
+    esbuild: {Esbuild, :install_and_run, [:catalogue, ~w(--sourcemap=inline --watch)]}
   ]
 
 # ## SSL Support
@@ -51,11 +52,13 @@ config :voipstack_classic_panel, VoipstackClassicPanelWeb.Endpoint,
 
 # Watch static and templates for browser reloading.
 config :voipstack_classic_panel, VoipstackClassicPanelWeb.Endpoint,
+  reloadable_compilers: [:gettext, :elixir, :app, :surface],
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/voipstack_classic_panel_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/voipstack_classic_panel_web/(controllers|live|components)/.*(ex|heex|sface|js)$",
+      ~r"priv/catalogue/.*(ex)$"
     ]
   ]
 

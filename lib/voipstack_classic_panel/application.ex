@@ -11,9 +11,10 @@ defmodule VoipstackClassicPanel.Application do
       VoipstackClassicPanelWeb.Telemetry,
       VoipstackClassicPanel.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:voipstack_classic_panel, :ecto_repos),
-        skip: skip_migrations?()},
-      {DNSCluster, query: Application.get_env(:voipstack_classic_panel, :dns_cluster_query) || :ignore},
+       repos: Application.fetch_env!(:voipstack_classic_panel, :ecto_repos),
+       skip: skip_migrations?()},
+      {DNSCluster,
+       query: Application.get_env(:voipstack_classic_panel, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: VoipstackClassicPanel.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: VoipstackClassicPanel.Finch},
