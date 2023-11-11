@@ -6,6 +6,7 @@ defmodule VoipstackClassicPanel.VirtualPBX do
   alias VoipstackClassicPanel.VirtualPBX.{Channel, Call}
 
   defstruct [:id, calls: %{}]
+  @type t :: %__MODULE__{}
 
   defmodule NotFoundCallError do
     defexception [:message]
