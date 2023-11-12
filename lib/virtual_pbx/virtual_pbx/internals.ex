@@ -24,6 +24,10 @@ defmodule VoipstackClassicPanel.VirtualPBX.Call do
   alias VoipstackClassicPanel.VirtualPBX.Channel
   alias VoipstackClassicPanel.VirtualPBX.Times
 
+  defmodule UpdateStateError do
+    defexception [:message]
+  end
+
   defstruct [:id, :state, :times, caller: %{}, callee: %{}, tags: %{}]
 
   @type t :: %__MODULE__{
@@ -40,6 +44,35 @@ defmodule VoipstackClassicPanel.VirtualPBX.Call do
 
   def add_caller(%__MODULE__{} = call, id, number, source) do
     %{call | caller: Channel.new(id, number, number, source)}
+  end
+
+  def update_call_state(%__MODULE__{state: :unknown} = call, :ringing) do
+    %{call | state: :ringing}
+  end
+
+  def update_call_state(%__MODULE__{state: :unknown} = call, :answered) do
+    %{call | state: :answered}
+  end
+
+  def update_call_state(%__MODULE__{state: :unknown} = call, :hangup) do
+    %{call | state: :hangup}
+  end
+
+  def update_call_state(%__MODULE__{state: :ringing} = call, :answered) do
+    %{call | state: :answered}
+  end
+
+  def update_call_state(%__MODULE__{state: :answered} = call, :hangup) do
+    %{call | state: :hangup}
+  end
+
+  def update_call_state(%__MODULE__{state: :ringing} = call, :hangup) do
+    %{call | state: :hangup}
+  end
+
+  def update_call_state(%__MODULE__{id: call_id, state: state}, new_state) do
+    raise UpdateStateError,
+      message: "can't update from state #{state} to #{new_state} for call #{call_id}"
   end
 
   # this is the new about this panel, every call can have

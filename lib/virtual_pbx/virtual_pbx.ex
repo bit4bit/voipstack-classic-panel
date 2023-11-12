@@ -55,6 +55,12 @@ defmodule VoipstackClassicPanel.VirtualPBX do
     get_call!(vpbx, call_id).tags
   end
 
+  def update_call_state(%__MODULE__{} = vpbx, call_id, new_state) do
+    call = get_call!(vpbx, call_id)
+    call = Call.update_call_state(call, new_state)
+    %{vpbx | calls: Map.put(vpbx, call_id, call)}
+  end
+
   defp add_channel(vpbx, call_id, channel_key, channel_id, channel_attrs) do
     channel = Keyword.validate!(channel_attrs, [:name, :number, :source])
     call = get_call!(vpbx, call_id)

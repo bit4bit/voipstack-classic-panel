@@ -80,12 +80,100 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
     end
   end
 
-  def a_vpbx() do
+  describe "call flow states" do
+    test "from unknown to ringing" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :ringing)
+
+      assert %{
+               state: :ringing
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "from unknown to answered (not ringing)" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :answered)
+
+      assert %{
+               state: :answered
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "from unknown to hangup (not answered)" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :hangup)
+
+      assert %{
+               state: :hangup
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "from ringing to answer" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :ringing)
+        |> VirtualPBX.update_call_state("1234567", :answered)
+
+      assert %{
+               state: :answered
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "from answered to hangup" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :ringing)
+        |> VirtualPBX.update_call_state("1234567", :answered)
+        |> VirtualPBX.update_call_state("1234567", :hangup)
+
+      assert %{
+               state: :hangup
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "from ringing to hangup" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :ringing)
+        |> VirtualPBX.update_call_state("1234567", :hangup)
+
+      assert %{
+               state: :hangup
+             } = get_call(vpbx, "1234567")
+    end
+
+    test "raises from answer to ringing" do
+      vpbx =
+        a_vpbx()
+        |> add_a_call("1234567")
+        |> VirtualPBX.update_call_state("1234567", :ringing)
+        |> VirtualPBX.update_call_state("1234567", :answered)
+
+      assert_raise VirtualPBX.Call.UpdateStateError, fn ->
+        VirtualPBX.update_call_state(vpbx, "1234567", :ringing)
+      end
+    end
+  end
+
+  defp a_vpbx() do
     VirtualPBX.new("test")
   end
 
-  def add_a_call(vpbx, call_id \\ "123456") do
+  defp add_a_call(vpbx, call_id \\ "123456") do
     VirtualPBX.add_call(vpbx, call_id)
+  end
+
+  defp get_call(vpbx, call_id) do
+    VirtualPBX.get_call(vpbx, call_id)
   end
 
   # autotaggear en base a reglas
