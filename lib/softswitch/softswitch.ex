@@ -24,11 +24,11 @@ defmodule VoipstackClassicPanel.Softswitch do
     %__MODULE__{handler: handler, handler_state: handler_state, vpbx: vpbx}
   end
 
-  def add_call(ctx, call_id, call_direction) do
-    vpbx = VirtualPBX.add_call(ctx.vpbx, call_id, call_direction)
+  def add_call(ctx, call_id) do
+    vpbx = VirtualPBX.add_call(ctx.vpbx, call_id)
     ctx = %{ctx | vpbx: vpbx}
 
-    event = %{call_id: call_id, direction: call_direction, caller: %{}, callee: %{}}
+    event = %{call_id: call_id, caller: %{}, callee: %{}}
     notify(ctx, :new_call, event)
 
     ctx

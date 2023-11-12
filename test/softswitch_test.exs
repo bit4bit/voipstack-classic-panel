@@ -23,15 +23,15 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
     end
 
     test "notify new call", %{handler: handler} do
-      Softswitch.add_call(handler, "123456", :inbound)
+      Softswitch.add_call(handler, "123456")
 
       assert_receive {:virtual_pbx, "test", :new_call,
-                      %{call_id: "123456", direction: :inbound, caller: %{}, callee: %{}}}
+                      %{call_id: "123456", caller: %{}, callee: %{}}}
     end
 
     test "notifies caller of call", %{handler: handler} do
       handler
-      |> Softswitch.add_call("123456", :inbound)
+      |> Softswitch.add_call("123456")
       |> Softswitch.add_caller("123456", "1234567",
         name: "test",
         number: "test",
@@ -41,12 +41,12 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
       assert_received {:virtual_pbx, "test", :new_call, _}
 
       assert_received {:virtual_pbx, "test", :update_call,
-                       %{id: "123456", direction: :inbound, caller: %{id: "1234567"}, callee: %{}}}
+                       %{id: "123456", caller: %{id: "1234567"}, callee: %{}}}
     end
 
     test "notifies callee of call", %{handler: handler} do
       handler
-      |> Softswitch.add_call("123456", :inbound)
+      |> Softswitch.add_call("123456")
       |> Softswitch.add_callee("123456", "1234567",
         name: "test",
         number: "test",
@@ -56,7 +56,7 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
       assert_received {:virtual_pbx, "test", :new_call, _}
 
       assert_received {:virtual_pbx, "test", :update_call,
-                       %{id: "123456", direction: :inbound, caller: %{}, callee: %{id: "1234567"}}}
+                       %{id: "123456", caller: %{}, callee: %{id: "1234567"}}}
     end
 
     test "does not notify caller on invalid call", %{handler: handler} do

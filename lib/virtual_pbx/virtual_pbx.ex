@@ -16,8 +16,8 @@ defmodule VoipstackClassicPanel.VirtualPBX do
     %__MODULE__{id: softswitch_id}
   end
 
-  def add_call(%__MODULE__{} = vpbx, call_id, call_direction) do
-    %{vpbx | calls: Map.put(vpbx.calls, call_id, Call.new(call_id, call_direction))}
+  def add_call(%__MODULE__{} = vpbx, call_id) do
+    %{vpbx | calls: Map.put(vpbx.calls, call_id, Call.new(call_id))}
   end
 
   def get_call(%__MODULE__{} = vpbx, call_id) do

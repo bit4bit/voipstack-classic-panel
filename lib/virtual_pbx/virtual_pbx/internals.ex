@@ -24,15 +24,14 @@ defmodule VoipstackClassicPanel.VirtualPBX.Call do
   alias VoipstackClassicPanel.VirtualPBX.Channel
   alias VoipstackClassicPanel.VirtualPBX.Times
 
-  defstruct [:id, :direction, :state, :times, caller: %{}, callee: %{}, tags: %{}]
+  defstruct [:id, :state, :times, caller: %{}, callee: %{}, tags: %{}]
 
   @type t :: %__MODULE__{
-          direction: :inbound | :outbound,
           state: :unknown | :ringing | :answered | :hangup
         }
 
-  def new(id, direction) when direction in [:inbound, :outbound] do
-    %__MODULE__{id: id, direction: direction, state: :unknown, times: Times.new()}
+  def new(id) do
+    %__MODULE__{id: id, state: :unknown, times: Times.new()}
   end
 
   def add_callee(%__MODULE__{} = call, id, number, source) do

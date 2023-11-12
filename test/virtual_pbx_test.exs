@@ -7,8 +7,8 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
   describe "VirtualPBX" do
     test "initials state of call" do
       vpbx =
-        VirtualPBX.new("test")
-        |> VirtualPBX.add_call("123456", :inbound)
+        a_vpbx()
+        |> add_a_call()
 
       assert %{
                state: :unknown
@@ -16,17 +16,15 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
     end
 
     test "raises exception if not found call" do
-      vpbx = VirtualPBX.new("test")
-
       assert_raise VirtualPBX.NotFoundCallError, fn ->
-        VirtualPBX.get_call(vpbx, "not-exists")
+        VirtualPBX.get_call(a_vpbx(), "not-exists")
       end
     end
 
     test "gets caller of call" do
       vpbx =
-        VirtualPBX.new("test")
-        |> VirtualPBX.add_call("123456", :inbound)
+        a_vpbx()
+        |> add_a_call()
         |> VirtualPBX.add_caller("123456", "1234567",
           name: "test",
           number: "test",
@@ -43,8 +41,8 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
 
     test "gets callee of call" do
       vpbx =
-        VirtualPBX.new("test")
-        |> VirtualPBX.add_call("123456", :inbound)
+        a_vpbx()
+        |> add_a_call()
         |> VirtualPBX.add_callee("123456", "1234567",
           name: "test",
           number: "test",
@@ -61,8 +59,8 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
 
     test "adds tag to call" do
       vpbx =
-        VirtualPBX.new("test")
-        |> VirtualPBX.add_call("123456", :inbound)
+        a_vpbx()
+        |> add_a_call()
         |> VirtualPBX.add_tag("123456", "Name", "test")
 
       assert %{
@@ -72,14 +70,22 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
 
     test "removes call" do
       vpbx =
-        VirtualPBX.new("test")
-        |> VirtualPBX.add_call("123456", :inbound)
+        a_vpbx()
+        |> add_a_call()
         |> VirtualPBX.remove_call("123456")
 
       assert_raise VirtualPBX.NotFoundCallError, fn ->
         VirtualPBX.get_call(vpbx, "123456")
       end
     end
+  end
+
+  def a_vpbx() do
+    VirtualPBX.new("test")
+  end
+
+  def add_a_call(vpbx, call_id \\ "123456") do
+    VirtualPBX.add_call(vpbx, call_id)
   end
 
   # autotaggear en base a reglas
