@@ -25,8 +25,8 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
     test "notify new call", %{handler: handler} do
       Softswitch.add_call(handler, "123456")
 
-      assert_receive {:virtual_pbx, "test", :new_call,
-                      %{call_id: "123456", caller: %{}, callee: %{}}}
+      assert_receive {:virtual_pbx, "test", :call_added,
+                      %{id: "123456", caller: %{}, callee: %{}}}
     end
 
     test "notifies caller of call", %{handler: handler} do
@@ -38,9 +38,7 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
         source: "extension"
       )
 
-      assert_received {:virtual_pbx, "test", :new_call, _}
-
-      assert_received {:virtual_pbx, "test", :update_call,
+      assert_received {:virtual_pbx, "test", :call_updated,
                        %{id: "123456", caller: %{id: "1234567"}, callee: %{}}}
     end
 
@@ -53,9 +51,7 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
         source: "extension"
       )
 
-      assert_received {:virtual_pbx, "test", :new_call, _}
-
-      assert_received {:virtual_pbx, "test", :update_call,
+      assert_received {:virtual_pbx, "test", :call_updated,
                        %{id: "123456", caller: %{}, callee: %{id: "1234567"}}}
     end
 
@@ -67,7 +63,7 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
         source: "extension"
       )
 
-      refute_received {:virtual_pbx, "test", :update_call, _}
+      refute_received {:virtual_pbx, "test", :call_updated, _}
     end
 
     test "does not notify callee on invalid call", %{handler: handler} do
@@ -78,7 +74,22 @@ defmodule VoipstackClassicPanel.SoftswitchTest do
         source: "extension"
       )
 
-      refute_received {:virtual_pbx, "test", :update_call, _}
+      refute_received {:virtual_pbx, "test", :call_updated, _}
+    end
+
+    test "notifies remove call", %{handler: handler} do
+      handler
+      |> Softswitch.add_call("123456")
+      |> Softswitch.remove_call("123456")
+
+      assert_received {:virtual_pbx, "test", :call_removed, %{id: "123456"}}
+    end
+
+    test "doesn't notify remove call on invalid call", %{handler: handler} do
+      handler
+      |> Softswitch.remove_call("123456")
+
+      refute_received {:virtual_pbx, "test", :call_removed, %{id: "123456"}}
     end
   end
 end

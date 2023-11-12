@@ -25,20 +25,40 @@ defmodule VoipstackClassicPanel.Softswitch do
   end
 
   def add_call(ctx, call_id) do
-    vpbx = VirtualPBX.add_call(ctx.vpbx, call_id)
-    ctx = %{ctx | vpbx: vpbx}
+    ctx =
+      update_vpbx(ctx, fn vpbx ->
+        VirtualPBX.add_call(vpbx, call_id)
+      end)
 
-    event = %{call_id: call_id, caller: %{}, callee: %{}}
-    notify(ctx, :new_call, event)
+    event = %{id: call_id, caller: %{}, callee: %{}}
+    notify(ctx, :call_added, event)
 
     ctx
   end
 
-  def add_caller(ctx, call_id, caller_id, call_attrs) do
-    vpbx = VirtualPBX.add_caller(ctx.vpbx, call_id, caller_id, call_attrs)
-    ctx = %{ctx | vpbx: vpbx}
+  def remove_call(ctx, call_id) do
+    call = VirtualPBX.get_call(ctx.vpbx, call_id)
 
-    notify(ctx, :update_call, VirtualPBX.get_call(vpbx, call_id))
+    ctx =
+      update_vpbx(ctx, fn vpbx ->
+        VirtualPBX.remove_call(vpbx, call_id)
+      end)
+
+    notify(ctx, :call_removed, call)
+
+    ctx
+  rescue
+    VirtualPBX.NotFoundCallError ->
+      ctx
+  end
+
+  def add_caller(ctx, call_id, caller_id, call_attrs) do
+    ctx =
+      update_vpbx(ctx, fn vpbx ->
+        VirtualPBX.add_caller(vpbx, call_id, caller_id, call_attrs)
+      end)
+
+    notify(ctx, :call_updated, VirtualPBX.get_call(ctx.vpbx, call_id))
 
     ctx
   rescue
@@ -47,10 +67,12 @@ defmodule VoipstackClassicPanel.Softswitch do
   end
 
   def add_callee(ctx, call_id, callee_id, call_attrs) do
-    vpbx = VirtualPBX.add_callee(ctx.vpbx, call_id, callee_id, call_attrs)
-    ctx = %{ctx | vpbx: vpbx}
+    ctx =
+      update_vpbx(ctx, fn vpbx ->
+        VirtualPBX.add_callee(vpbx, call_id, callee_id, call_attrs)
+      end)
 
-    notify(ctx, :update_call, VirtualPBX.get_call(vpbx, call_id))
+    notify(ctx, :call_updated, VirtualPBX.get_call(ctx.vpbx, call_id))
 
     ctx
   rescue
@@ -63,5 +85,10 @@ defmodule VoipstackClassicPanel.Softswitch do
       {:virtual_pbx, ctx.vpbx.id, event_name, event},
       ctx.handler_state
     )
+  end
+
+  defp update_vpbx(ctx, updater) do
+    vpbx = updater.(ctx.vpbx)
+    %{ctx | vpbx: vpbx}
   end
 end
