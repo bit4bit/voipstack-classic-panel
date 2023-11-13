@@ -36,6 +36,15 @@ defmodule VoipstackClassicPanel.SoftswitchEventServerTest do
 
       assert_receive {:softswitch, "softswitch", :initial_state, %{calls: %{}}}
     end
+
+    test "notifies new call" do
+      softswitch = start_supervised!({SoftswitchEventServer, softswitch_id: "softswitch"})
+      SoftswitchEventServer.start_listening(softswitch)
+
+      SoftswitchEventServer.add_call(softswitch, "123456")
+
+      assert_receive {:softswitch, "softswitch", :call_added, %{id: "123456"}}
+    end
   end
 
   defp get_listeners(softswitch) do
