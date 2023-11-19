@@ -8,6 +8,7 @@ defmodule VoipstackClassicPanel.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {VoipstackClassicPanel.SoftswitchEventServer, name: SoftswitchServer},
       VoipstackClassicPanelWeb.Telemetry,
       {DNSCluster,
        query: Application.get_env(:voipstack_classic_panel, :dns_cluster_query) || :ignore},

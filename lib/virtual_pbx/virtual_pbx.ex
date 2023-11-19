@@ -3,9 +3,9 @@ defmodule VoipstackClassicPanel.VirtualPBX do
   Abstraction of softswitch
   """
 
-  alias VoipstackClassicPanel.VirtualPBX.{Channel, Call}
+  alias VoipstackClassicPanel.VirtualPBX.{Channel, Call, CallcenterQueue, CallcenterAgent}
 
-  defstruct [:id, calls: %{}]
+  defstruct [:id, calls: %{}, callcenter_queues: %{}, callcenter_agents: %{}]
   @type t :: %__MODULE__{}
 
   defmodule NotFoundCallError do
@@ -18,6 +18,49 @@ defmodule VoipstackClassicPanel.VirtualPBX do
 
   def add_call(%__MODULE__{} = vpbx, call_id) do
     %{vpbx | calls: Map.put(vpbx.calls, call_id, Call.new(call_id))}
+  end
+
+  def add_callcenter_queue(%__MODULE__{} = vpbx, queue_name, realm) do
+    queue_id = queue_id(queue_name, realm)
+
+    %{
+      vpbx
+      | callcenter_queues:
+          Map.put(
+            vpbx.callcenter_queues,
+            queue_id,
+            CallcenterQueue.new(queue_id, queue_name, realm)
+          )
+    }
+  end
+
+  def list_callcenter_queues(%__MODULE__{} = vpbx, realm) do
+    Enum.filter(vpbx.callcenter_queues, fn
+      {_key, queue} ->
+        queue.realm == realm
+    end)
+    |> Enum.map(&elem(&1, 1))
+  end
+
+  def add_callcenter_agent(%__MODULE__{} = vpbx, queue_name, realm, agent_name) do
+    queue_id = queue_id(queue_name, realm)
+    agent = CallcenterAgent.new(agent_name)
+
+    %{
+      vpbx
+      | callcenter_agents:
+          Map.update(
+            vpbx.callcenter_agents,
+            queue_id,
+            MapSet.new([agent]),
+            &MapSet.put(&1, agent)
+          )
+    }
+  end
+
+  def list_callcenter_agents(%__MODULE__{} = vpbx, queue_name, realm) do
+    Map.get(vpbx.callcenter_agents, queue_id(queue_name, realm), MapSet.new())
+    |> MapSet.to_list()
   end
 
   def get_call(%__MODULE__{} = vpbx, call_id) do
@@ -38,6 +81,10 @@ defmodule VoipstackClassicPanel.VirtualPBX do
 
   def get_callee(%__MODULE__{} = vpbx, call_id) do
     get_call!(vpbx, call_id).callee |> Map.from_struct()
+  end
+
+  def get_callcenter_queue(%__MODULE__{} = vpbx, queue_name, realm) do
+    Map.get(vpbx.callcenter_queues, queue_id(queue_name, realm), %{})
   end
 
   def remove_call(%__MODULE__{} = vpbx, call_id) do
@@ -83,5 +130,9 @@ defmodule VoipstackClassicPanel.VirtualPBX do
       call ->
         call
     end
+  end
+
+  defp queue_id(name, realm) do
+    "#{name}:#{realm}"
   end
 end

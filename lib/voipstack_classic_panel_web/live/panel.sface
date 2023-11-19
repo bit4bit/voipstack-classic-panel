@@ -1,0 +1,9 @@
+<div class="flex justify-center mt-12">
+  {#for {call_id, _details} <- @calls}
+    <Card max_width="lg" rounded>
+      <:header>
+        Call {call_id}
+      </:header>
+    </Card>
+  {/for}
+</div>

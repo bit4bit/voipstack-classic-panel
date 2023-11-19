@@ -2,7 +2,7 @@ defmodule VoipstackClassicPanel.SoftswitchEventServer do
   @moduledoc false
 
   use GenServer
-
+  require Logger
   alias VoipstackClassicPanel.VirtualPBX
   alias VoipstackClassicPanel.Softswitch
 
@@ -24,6 +24,8 @@ defmodule VoipstackClassicPanel.SoftswitchEventServer do
   end
 
   def start_listening(server) do
+    Logger.info(inspect(server))
+
     GenServer.cast(server, {:add_listener, self()})
   end
 

@@ -21,6 +21,7 @@ defmodule VoipstackClassicPanelWeb.Router do
 
     get "/", PageController, :home
     live "/demo", Demo
+    live "/panel", Panel
   end
 
   # Other scopes may use custom stacks.

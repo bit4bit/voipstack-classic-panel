@@ -8,6 +8,26 @@ defmodule VoipstackClassicPanel.VirtualPBX.Times do
   end
 end
 
+defmodule VoipstackClassicPanel.VirtualPBX.CallcenterQueue do
+  @moduledoc false
+
+  defstruct [:id, :name, :realm]
+
+  def new(id, name, realm) do
+    %__MODULE__{id: id, name: name, realm: realm}
+  end
+end
+
+defmodule VoipstackClassicPanel.VirtualPBX.CallcenterAgent do
+  @moduledoc false
+
+  defstruct [:name, :state]
+
+  def new(name) do
+    %__MODULE__{name: name, state: :unknown}
+  end
+end
+
 defmodule VoipstackClassicPanel.VirtualPBX.Channel do
   @moduledoc false
 

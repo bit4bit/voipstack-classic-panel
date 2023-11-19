@@ -80,6 +80,47 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
     end
   end
 
+  describe "callcenter" do
+    test "adds callcenter queue" do
+      vpbx =
+        a_vpbx()
+        |> VirtualPBX.add_callcenter_queue("demo", "test")
+
+      assert %{
+               name: "demo",
+               realm: "test"
+             } = get_callcenter_queue(vpbx, "demo", "test")
+    end
+
+    test "lists callcenter queues" do
+      vpbx =
+        a_vpbx()
+        |> VirtualPBX.add_callcenter_queue("demo", "test")
+        |> VirtualPBX.add_callcenter_queue("demo", "notest")
+
+      assert [
+               %{
+                 name: "demo",
+                 realm: "test"
+               }
+             ] = VirtualPBX.list_callcenter_queues(vpbx, "test")
+    end
+
+    test "lists callcenter agents" do
+      vpbx =
+        a_vpbx()
+        |> VirtualPBX.add_callcenter_queue("demo", "test")
+        |> VirtualPBX.add_callcenter_agent("demo", "test", "agent1")
+
+      assert [
+               %{
+                 name: "agent1",
+                 state: :unknown
+               }
+             ] = VirtualPBX.list_callcenter_agents(vpbx, "demo", "test")
+    end
+  end
+
   describe "call flow states" do
     test "from unknown to ringing" do
       vpbx =
@@ -174,6 +215,10 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
 
   defp get_call(vpbx, call_id) do
     VirtualPBX.get_call(vpbx, call_id)
+  end
+
+  defp get_callcenter_queue(vpbx, queue, realm) do
+    VirtualPBX.get_callcenter_queue(vpbx, queue, realm)
   end
 
   # autotaggear en base a reglas
