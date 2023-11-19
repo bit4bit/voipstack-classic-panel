@@ -21,6 +21,15 @@ end
 defmodule VoipstackClassicPanel.VirtualPBX.CallcenterAgent do
   @moduledoc false
 
+  defmodule RequiresCallcenterQueueError do
+    defexception [:queue, :realm]
+
+    @impl true
+    def message(%{queue: queue, realm: realm}) do
+      "requires callcenter queue #{queue} of realm #{realm}"
+    end
+  end
+
   defstruct [:name, :state]
 
   def new(name) do

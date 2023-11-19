@@ -46,6 +46,10 @@ defmodule VoipstackClassicPanel.VirtualPBX do
     queue_id = queue_id(queue_name, realm)
     agent = CallcenterAgent.new(agent_name)
 
+    if not Map.has_key?(vpbx.callcenter_queues, queue_id) do
+      raise CallcenterAgent.RequiresCallcenterQueueError, queue: queue_name, realm: realm
+    end
+
     %{
       vpbx
       | callcenter_agents:

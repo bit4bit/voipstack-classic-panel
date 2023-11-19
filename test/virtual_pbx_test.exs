@@ -119,6 +119,13 @@ defmodule VoipstackClassicPanel.VirtualPBXTest do
                }
              ] = VirtualPBX.list_callcenter_agents(vpbx, "demo", "test")
     end
+
+    test "adds callcenters agents requires callcenter queue" do
+      assert_raise VirtualPBX.CallcenterAgent.RequiresCallcenterQueueError, fn ->
+        a_vpbx()
+        |> VirtualPBX.add_callcenter_agent("demo", "test", "agent1")
+      end
+    end
   end
 
   describe "call flow states" do
