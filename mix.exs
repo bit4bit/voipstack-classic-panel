@@ -60,7 +60,8 @@ defmodule VoipstackClassicPanel.MixProject do
       {:bandit, "~> 1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:surface_catalogue, "~> 0.6.0"}
+      {:surface_catalogue, "~> 0.6.0"},
+      {:eslx, "~> 0.1"}
     ]
   end
 
