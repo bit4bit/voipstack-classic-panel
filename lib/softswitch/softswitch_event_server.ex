@@ -37,6 +37,16 @@ defmodule VoipstackClassicPanel.SoftswitchEventServer do
     GenServer.cast(server, {:add_call, call_id})
   end
 
+  def add_caller(server, call_id, caller_id, call_attrs) when is_list(call_attrs) do
+    case Keyword.validate(call_attrs, [:name, :number, :source]) do
+      {:error, fields} ->
+        {:error, fields}
+
+      {:ok, call_attrs} ->
+        GenServer.call(server, {:add_caller, call_id, caller_id, call_attrs})
+    end
+  end
+
   @impl true
   def init(opts) do
     id = Keyword.get(opts, :softswitch_id, "softswitch")
@@ -46,6 +56,13 @@ defmodule VoipstackClassicPanel.SoftswitchEventServer do
       |> Softswitch.init(SendHandler, self())
 
     {:ok, %{id: id, softswitch: softswitch, listeners: %{}}}
+  end
+
+  @impl true
+  def handle_call({:add_caller, call_id, caller_id, call_attrs}, _from, state) do
+    softswitch = Softswitch.add_caller(state.softswitch, call_id, caller_id, call_attrs)
+
+    {:reply, :ok, %{state | softswitch: softswitch}}
   end
 
   @impl true
@@ -72,6 +89,12 @@ defmodule VoipstackClassicPanel.SoftswitchEventServer do
   @impl true
   def handle_info({:virtual_pbx, _, :call_added, event}, state) do
     notify(state.listeners, {:softswitch, state.id, :call_added, event})
+
+    {:noreply, state}
+  end
+
+  def handle_info({:virtual_pbx, _, :call_updated, event}, state) do
+    notify(state.listeners, {:softswitch, state.id, :call_updated, event})
 
     {:noreply, state}
   end
