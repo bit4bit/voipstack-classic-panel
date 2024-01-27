@@ -61,7 +61,8 @@ defmodule VoipstackClassicPanel.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:surface_catalogue, "~> 0.6.0"},
-      {:eslx, "~> 0.1"}
+      {:eslx, "~> 0.1"},
+      {:ecto_sql, "~> 3.11"}
     ]
   end
 
